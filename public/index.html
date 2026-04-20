@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment App</title>
+</head>
+<body>
+<style>
+   
+  body { font-family: Arial; }
+  button { margin-left: 10px; }
+  li { margin-bottom: 10px; }
+</style>
+
+<h2>Simple Payment App</h2>
+
+<!-- ====================== -->
+<!-- ADD PAYMENT -->
+<!-- ====================== -->
+<h3>Add Payment</h3>
+
+<input id="customer" placeholder="Customer Name"><br><br>
+<input id="item" placeholder="Item"><br><br>
+<input id="amount" placeholder="Amount"><br><br>
+
+<button onclick="addPayment()">Save Payment</button>
+
+<hr>
+
+<!-- ====================== -->
+<!-- VIEW PAYMENTS -->
+<!-- ====================== -->
+<h3>All Payments</h3>
+
+<button onclick="loadPayments()">Load Payments</button>
+
+<ul id="list"></ul>
+
+<script src="app.js"></script>
+
+</body>
+</html>
