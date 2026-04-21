@@ -1,7 +1,8 @@
 const Database = require("better-sqlite3");
 
 // ✅ CREATE DATABASE INSTANCE FIRST
-const db = new Database("payments.db");
+
+const db = new Database("/tmp/payments.db");
 
 // ✅ THEN USE IT
 db.exec(`
