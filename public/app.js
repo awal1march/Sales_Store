@@ -1,4 +1,5 @@
 const API = "https://sales-store.onrender.com";
+//const API="http://localhost:3000"
 
 // SAVE PAYMENT
 async function addPayment() {

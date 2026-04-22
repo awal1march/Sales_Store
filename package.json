@@ -17,5 +17,13 @@
     "express": "^5.2.1",
     "expression": "^0.0.1",
     "jsonwebtoken": "^9.0.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awal1march/Sales_Store.git"
+  },
+  "bugs": {
+    "url": "https://github.com/awal1march/Sales_Store/issues"
+  },
+  "homepage": "https://github.com/awal1march/Sales_Store#readme"
 }
