@@ -4,7 +4,7 @@ const path = require("path");
 // ALWAYS safe path
 const dbPath = path.join(__dirname, "payments.db");
 
-const db = new Database(dbPath);
+const db = new Database('./database.db');
 
 // create table
 db.exec(`
