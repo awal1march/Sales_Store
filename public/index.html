@@ -2,40 +2,68 @@
 <html>
 <head>
   <title>Payment App</title>
+
+  <style>
+    body { font-family: Arial; margin: 10px; }
+    button { margin: 5px; }
+    li { margin-bottom: 15px; }
+    input { padding: 6px; margin: 4px 0; width: 100%; max-width: 300px; }
+
+    #dashboard { background:#f2f2f2; padding:10px; margin-bottom:15px; }
+
+    /* 🌙 Dark Mode */
+    body.dark { background:#121212; color:white; }
+    body.dark #dashboard { background:#1e1e1e; }
+
+    /* 📱 Mobile */
+    @media (max-width:600px) {
+      body { font-size: 14px; }
+      button { width: 100%; }
+    }
+  </style>
 </head>
+
 <body>
-<style>
-   
-  body { font-family: Arial; }
-  button { margin-left: 10px; }
-  li { margin-bottom: 10px; }
-</style>
 
-<h2>Simple Payment App</h2>
+<h2>Payment App</h2>
 
-<!-- ====================== -->
-<!-- ADD PAYMENT -->
-<!-- ====================== -->
-<h3>Add Payment</h3>
+<!-- LOGIN -->
+<div id="loginBox">
+  <input id="username" placeholder="Username"><br>
+  <input id="password" type="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+</div>
 
-<input id="customer" placeholder="Customer Name"><br><br>
-<input id="item" placeholder="Item"><br><br>
-<input id="amount" placeholder="Amount"><br><br>
+<div id="app" style="display:none;">
 
-<button onclick="addPayment()">Save Payment</button>
+<!-- DASHBOARD -->
+<div id="dashboard">
+  Total Sales: <span id="totalSales">0</span><br>
+  Total Paid: <span id="totalPaid">0</span><br>
+  Balance: <span id="totalBalance">0</span>
+</div>
+
+<!-- CONTROLS -->
+<button onclick="toggleDark()">🌙 Toggle Dark Mode</button>
+<button onclick="exportCSV()">📊 Export Excel</button>
+<button onclick="dailyReport()">📅 Daily Report</button>
 
 <hr>
 
-<!-- ====================== -->
-<!-- VIEW PAYMENTS -->
-<!-- ====================== -->
-<h3>All Payments</h3>
+<!-- ADD -->
+<input id="customer" placeholder="Customer Name">
+<input id="item" placeholder="Item">
+<input id="amount" placeholder="Amount">
+<button onclick="addPayment()">Save</button>
 
-<button onclick="loadPayments()">Load Payments</button>
+<hr>
 
-<ul id="list"></ul>
+<input id="search" placeholder="Search..." oninput="loadPayments()">
+
+<ol id="list"></ol>
+
+</div>
 
 <script src="app.js"></script>
-
 </body>
 </html>
