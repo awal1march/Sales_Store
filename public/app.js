@@ -34,8 +34,7 @@ async function addPayment() {
     body: JSON.stringify({
       customer_name: customer,
       item,
-      total_amount: parseFloat(amount),
-      date: new Date().toISOString()
+      total_amount: Number(amount)
     })
   });
 
@@ -43,7 +42,7 @@ async function addPayment() {
 }
 
 // ======================
-// LOAD PAYMENTS (🔥 FIXED UI)
+// LOAD PAYMENTS
 // ======================
 async function loadPayments() {
   const res = await fetch(API + "/payments/all");
@@ -67,8 +66,8 @@ async function loadPayments() {
 
   data.forEach((p, i) => {
 
-    const paid = p.paid_amount || 0;
-    const total = p.total_amount || 0;
+    const paid = Number(p.paid_amount) || 0;
+    const total = Number(p.total_amount) || 0;
     const balance = total - paid;
 
     const status = paid >= total ? "completed" : "pending";
@@ -83,6 +82,8 @@ async function loadPayments() {
 
         💰 Paid: ${paid} / ${total}<br>
         🔥 Balance: ${balance}<br>
+
+        📅 Date: ${p.created_at ? new Date(p.created_at).toLocaleString() : "N/A"}<br>
 
         📌 Status: ${status === "completed"
           ? "<span style='color:green;'>✔ COMPLETED</span>"
@@ -129,7 +130,7 @@ async function paySmall(id) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       id,
-      amount: parseFloat(amount)
+      amount: Number(amount)
     })
   });
 
@@ -163,7 +164,7 @@ function exportCSV() {
 }
 
 // ======================
-// DAILY REPORT
+// DAILY REPORT (FIXED)
 // ======================
 function dailyReport() {
   const today = new Date().toDateString();
@@ -171,8 +172,8 @@ function dailyReport() {
   let total = 0;
 
   cachedData.forEach(p => {
-    if (p.date && new Date(p.date).toDateString() === today) {
-      total += p.total_amount || 0;
+    if (p.created_at && new Date(p.created_at).toDateString() === today) {
+      total += Number(p.total_amount) || 0;
     }
   });
 
