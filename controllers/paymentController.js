@@ -13,14 +13,15 @@ exports.addPayment = (req, res) => {
     }
 
     db.prepare(`
-      INSERT INTO payments (customer_name, item, total_amount, paid_amount, status, created_at)
+      INSERT INTO payments 
+      (customer_name, item, total_amount, paid_amount, status, created_at)
       VALUES (?, ?, ?, 0, 'pending', datetime('now'))
-    `).run(customer_name, item, total_amount);
+    `).run(customer_name, item, Number(total_amount));
 
     res.json({ message: "Payment added successfully" });
 
   } catch (err) {
-    console.error(err);
+    console.error("ADD ERROR:", err);
     res.status(500).json({ message: "Error adding payment" });
   }
 };
@@ -38,13 +39,13 @@ exports.getPayments = (req, res) => {
     res.json(data);
 
   } catch (err) {
-    console.error(err);
+    console.error("GET ERROR:", err);
     res.status(500).json({ message: "Error fetching payments" });
   }
 };
 
 // ======================
-// DELETE PAYMENT (soft-safe version recommended)
+// DELETE PAYMENT (HARD DELETE - OPTIONAL)
 // ======================
 exports.deletePayment = (req, res) => {
   const { id } = req.params;
@@ -61,17 +62,21 @@ exports.deletePayment = (req, res) => {
     res.json({ message: "Payment deleted successfully" });
 
   } catch (err) {
-    console.error(err);
+    console.error("DELETE ERROR:", err);
     res.status(500).json({ message: "Error deleting payment" });
   }
 };
 
 // ======================
-// ADD PARTIAL PAYMENT (INSTALLMENT)
+// ADD PARTIAL PAYMENT (INSTALLMENT FIXED)
 // ======================
 exports.addPartialPayment = (req, res) => {
   try {
     const { id, amount } = req.body;
+
+    if (!id || !amount) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
 
     const payment = db.prepare(
       "SELECT * FROM payments WHERE id = ?"
@@ -81,12 +86,14 @@ exports.addPartialPayment = (req, res) => {
       return res.status(404).json({ message: "Payment not found" });
     }
 
-    const currentPaid = payment.paid_amount || 0;
-    const total = payment.total_amount || 0;
+    const currentPaid = Number(payment.paid_amount) || 0;
+    const total = Number(payment.total_amount) || 0;
+    const addAmount = Number(amount);
 
-    const newPaid = currentPaid + Number(amount);
+    const newPaid = currentPaid + addAmount;
 
     let status = "pending";
+
     if (newPaid >= total) {
       status = "completed";
     }
@@ -100,11 +107,13 @@ exports.addPartialPayment = (req, res) => {
     res.json({
       message: "Payment updated successfully",
       paid: newPaid,
+      total,
+      balance: total - newPaid,
       status
     });
 
   } catch (err) {
-    console.error("UPDATE ERROR:", err);
+    console.error("INSTALLMENT ERROR:", err);
     res.status(500).json({
       message: "Error updating payment",
       error: err.message

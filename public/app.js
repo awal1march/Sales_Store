@@ -1,8 +1,10 @@
 const API = "https://sales-store-5a8r.onrender.com";
 
-let cachedData = []; // store data for export/report
+let cachedData = [];
 
+// ======================
 // LOGIN
+// ======================
 function login() {
   if (
     document.getElementById("username").value === "admin" &&
@@ -16,7 +18,9 @@ function login() {
   }
 }
 
+// ======================
 // ADD PAYMENT
+// ======================
 async function addPayment() {
   const customer = document.getElementById("customer").value;
   const item = document.getElementById("item").value;
@@ -26,7 +30,7 @@ async function addPayment() {
 
   await fetch(API + "/payments/add", {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       customer_name: customer,
       item,
@@ -38,34 +42,59 @@ async function addPayment() {
   loadPayments();
 }
 
-// LOAD
+// ======================
+// LOAD PAYMENTS (🔥 FIXED UI)
+// ======================
 async function loadPayments() {
   const res = await fetch(API + "/payments/all");
   let data = await res.json();
 
-  cachedData = data; // save for export/report
+  cachedData = data;
 
   const search = document.getElementById("search").value.toLowerCase();
+
   if (search) {
     data = data.filter(p =>
       p.customer_name.toLowerCase().includes(search)
     );
   }
 
-  let totalSales = 0, totalPaid = 0;
+  let totalSales = 0;
+  let totalPaid = 0;
 
   const list = document.getElementById("list");
   list.innerHTML = "";
 
   data.forEach((p, i) => {
-    totalSales += p.total_amount || 0;
-    totalPaid += p.paid_amount || 0;
+
+    const paid = p.paid_amount || 0;
+    const total = p.total_amount || 0;
+    const balance = total - paid;
+
+    const status = paid >= total ? "completed" : "pending";
+
+    totalSales += total;
+    totalPaid += paid;
 
     list.innerHTML += `
       <li>
-        <strong>${i+1}. ${p.customer_name}</strong><br>
-        ${p.item} - ${p.total_amount}<br>
-        Paid: ${p.paid_amount ?? 0}<br>
+        <strong>${i + 1}. ${p.customer_name}</strong><br>
+        Item: ${p.item}<br>
+
+        💰 Paid: ${paid} / ${total}<br>
+        🔥 Balance: ${balance}<br>
+
+        📌 Status: ${status === "completed"
+          ? "<span style='color:green;'>✔ COMPLETED</span>"
+          : "<span style='color:orange;'>PENDING</span>"
+        }<br><br>
+
+        ${status !== "completed" ? `
+          <button onclick="paySmall(${p.id})">Add Payment</button>
+          <button onclick="deletePayment(${p.id})">❌ Delete</button>
+        ` : `
+          <span style="color:green;">✔ Fully Paid</span>
+        `}
       </li>
     `;
   });
@@ -75,12 +104,48 @@ async function loadPayments() {
   document.getElementById("totalBalance").innerText = totalSales - totalPaid;
 }
 
-// 🌙 DARK MODE
+// ======================
+// DELETE PAYMENT
+// ======================
+async function deletePayment(id) {
+  if (!confirm("Delete this payment?")) return;
+
+  await fetch(`${API}/payments/delete/${id}`, {
+    method: "DELETE"
+  });
+
+  loadPayments();
+}
+
+// ======================
+// INSTALLMENT PAYMENT
+// ======================
+async function paySmall(id) {
+  const amount = prompt("Enter installment:");
+  if (!amount || isNaN(amount)) return alert("Invalid amount");
+
+  await fetch(API + "/payments/pay-small", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id,
+      amount: parseFloat(amount)
+    })
+  });
+
+  loadPayments();
+}
+
+// ======================
+// DARK MODE
+// ======================
 function toggleDark() {
   document.body.classList.toggle("dark");
 }
 
-// 📊 EXPORT CSV (Excel)
+// ======================
+// EXPORT CSV
+// ======================
 function exportCSV() {
   let csv = "Customer,Item,Amount,Paid\n";
 
@@ -97,7 +162,9 @@ function exportCSV() {
   a.click();
 }
 
-// 📅 DAILY REPORT
+// ======================
+// DAILY REPORT
+// ======================
 function dailyReport() {
   const today = new Date().toDateString();
 
@@ -110,19 +177,4 @@ function dailyReport() {
   });
 
   alert("Today's total sales: " + total);
-}
-async function paySmall(id) {
-  const amount = prompt("Enter installment:");
-  if (!amount || isNaN(amount)) return alert("Invalid amount");
-
-  await fetch(API + "/payments/pay-small", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      id,
-      amount: parseFloat(amount)
-    })
-  });
-
-  loadPayments();
 }

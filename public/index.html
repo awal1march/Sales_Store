@@ -4,66 +4,122 @@
   <title>Payment App</title>
 
   <style>
-    body { font-family: Arial; margin: 10px; }
-    button { margin: 5px; }
-    li { margin-bottom: 15px; }
-    input { padding: 6px; margin: 4px 0; width: 100%; max-width: 300px; }
+    body {
+      font-family: Arial;
+      margin: 10px;
+      transition: 0.3s;
+    }
 
-    #dashboard { background:#f2f2f2; padding:10px; margin-bottom:15px; }
+    h2 { text-align: center; }
+
+    button {
+      margin: 5px;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    li {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    input {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 350px;
+      display: block;
+    }
+
+    #dashboard {
+      background: #f2f2f2;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
 
     /* 🌙 Dark Mode */
-    body.dark { background:#121212; color:white; }
-    body.dark #dashboard { background:#1e1e1e; }
+    body.dark {
+      background: #121212;
+      color: white;
+    }
+
+    body.dark li {
+      border: 1px solid #333;
+      background: #1e1e1e;
+    }
+
+    body.dark #dashboard {
+      background: #1e1e1e;
+    }
 
     /* 📱 Mobile */
     @media (max-width:600px) {
       body { font-size: 14px; }
       button { width: 100%; }
+      input { max-width: 100%; }
+    }
+
+    .btn-group button {
+      margin-right: 5px;
     }
   </style>
 </head>
 
 <body>
 
-<h2>Payment App</h2>
+<h2>💰 Payment App</h2>
 
 <!-- LOGIN -->
 <div id="loginBox">
-  <input id="username" placeholder="Username"><br>
-  <input id="password" type="password" placeholder="Password"><br>
+  <h3>Login</h3>
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
   <button onclick="login()">Login</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
 <!-- DASHBOARD -->
 <div id="dashboard">
+  <strong>📊 Dashboard</strong><br>
   Total Sales: <span id="totalSales">0</span><br>
   Total Paid: <span id="totalPaid">0</span><br>
   Balance: <span id="totalBalance">0</span>
 </div>
 
 <!-- CONTROLS -->
-<button onclick="toggleDark()">🌙 Toggle Dark Mode</button>
+<button onclick="toggleDark()">🌙 Dark Mode</button>
 <button onclick="exportCSV()">📊 Export Excel</button>
 <button onclick="dailyReport()">📅 Daily Report</button>
 
 <hr>
 
-<!-- ADD -->
+<!-- ADD PAYMENT -->
+<h3>Add Payment</h3>
+
 <input id="customer" placeholder="Customer Name">
 <input id="item" placeholder="Item">
-<input id="amount" placeholder="Amount">
-<button onclick="addPayment()">Save</button>
+<input id="amount" placeholder="Total Amount">
+
+<button onclick="addPayment()">➕ Save Payment</button>
 
 <hr>
 
-<input id="search" placeholder="Search..." oninput="loadPayments()">
+<!-- SEARCH -->
+<input id="search" placeholder="🔍 Search customer..." oninput="loadPayments()">
 
+<hr>
+
+<!-- LIST -->
 <ol id="list"></ol>
 
 </div>
 
 <script src="app.js"></script>
+
 </body>
 </html>
