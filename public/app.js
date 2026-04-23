@@ -60,6 +60,9 @@ async function loadPayments() {
 
   let totalSales = 0;
   let totalPaid = 0;
+  let todayPaid = 0;
+
+  const today = new Date().toDateString();
 
   const list = document.getElementById("list");
   list.innerHTML = "";
@@ -74,6 +77,12 @@ async function loadPayments() {
 
     totalSales += total;
     totalPaid += paid;
+
+    const date = p.created_at ? new Date(p.created_at).toDateString() : "";
+
+    if (date === today) {
+      todayPaid += paid;
+    }
 
     list.innerHTML += `
       <li>
@@ -103,6 +112,11 @@ async function loadPayments() {
   document.getElementById("totalSales").innerText = totalSales;
   document.getElementById("totalPaid").innerText = totalPaid;
   document.getElementById("totalBalance").innerText = totalSales - totalPaid;
+
+  // ✅ TODAY CASH RECEIVED (NEW FIX)
+  if (document.getElementById("todayPaid")) {
+    document.getElementById("todayPaid").innerText = todayPaid;
+  }
 }
 
 // ======================
@@ -164,18 +178,20 @@ function exportCSV() {
 }
 
 // ======================
-// DAILY REPORT (FIXED)
+// DAILY REPORT (FIXED = CASH ONLY)
 // ======================
 function dailyReport() {
   const today = new Date().toDateString();
 
-  let total = 0;
+  let totalPaidToday = 0;
 
   cachedData.forEach(p => {
-    if (p.created_at && new Date(p.created_at).toDateString() === today) {
-      total += Number(p.total_amount) || 0;
+    const date = p.created_at ? new Date(p.created_at).toDateString() : null;
+
+    if (date === today) {
+      totalPaidToday += Number(p.paid_amount) || 0;
     }
   });
 
-  alert("Today's total sales: " + total);
+  alert("💰 Today's cash received: " + totalPaidToday);
 }
