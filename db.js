@@ -2,7 +2,7 @@ const Database = require("better-sqlite3");
 const path = require("path");
 
 // ALWAYS safe path
-const dbPath = path.join(__dirname, "payments.db");
+//const dbPath = path.join(__dirname, "payments.db");
 
 //const db = new Database('./database.db');
 const db = new Database(path.join(__dirname, 'database.db'));
