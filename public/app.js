@@ -111,3 +111,18 @@ function dailyReport() {
 
   alert("Today's total sales: " + total);
 }
+async function paySmall(id) {
+  const amount = prompt("Enter installment:");
+  if (!amount || isNaN(amount)) return alert("Invalid amount");
+
+  await fetch(API + "/payments/pay-small", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id,
+      amount: parseFloat(amount)
+    })
+  });
+
+  loadPayments();
+}

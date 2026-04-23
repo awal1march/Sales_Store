@@ -5,51 +5,74 @@ const db = require("../db");
 // ADD PAYMENT
 // ======================
 exports.addPayment = (req, res) => {
-  const { customer_name, item, total_amount } = req.body;
+  try {
+    const { customer_name, item, total_amount } = req.body;
 
-  db.prepare(`
-    INSERT INTO payments (customer_name, item, total_amount, paid_amount, status)
-    VALUES (?, ?, ?, 0, 'pending')
-  `).run(customer_name, item, total_amount);
+    if (!customer_name || !item || !total_amount) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
 
-  res.json({ message: "Payment added successfully" });
+    db.prepare(`
+      INSERT INTO payments (customer_name, item, total_amount, paid_amount, status, created_at)
+      VALUES (?, ?, ?, 0, 'pending', datetime('now'))
+    `).run(customer_name, item, total_amount);
+
+    res.json({ message: "Payment added successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error adding payment" });
+  }
 };
 
 // ======================
 // GET PAYMENTS
 // ======================
 exports.getPayments = (req, res) => {
-  const data = db.prepare(`
-    SELECT * FROM payments ORDER BY created_at DESC
-  `).all();
+  try {
+    const data = db.prepare(`
+      SELECT * FROM payments
+      ORDER BY created_at DESC
+    `).all();
 
-  res.json(data);
+    res.json(data);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching payments" });
+  }
 };
 
 // ======================
-// DELETE PAYMENT
+// DELETE PAYMENT (soft-safe version recommended)
 // ======================
 exports.deletePayment = (req, res) => {
   const { id } = req.params;
 
-  const result = db.prepare(
-    "DELETE FROM payments WHERE id = ?"
-  ).run(id);
+  try {
+    const result = db.prepare(
+      "DELETE FROM payments WHERE id = ?"
+    ).run(id);
 
-  if (result.changes === 0) {
-    return res.status(404).json({ message: "Payment not found" });
+    if (result.changes === 0) {
+      return res.status(404).json({ message: "Payment not found" });
+    }
+
+    res.json({ message: "Payment deleted successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error deleting payment" });
   }
-
-  res.json({ message: "Payment deleted successfully" });
 };
 
 // ======================
-// ADD PARTIAL PAYMENT
+// ADD PARTIAL PAYMENT (INSTALLMENT)
 // ======================
 exports.addPartialPayment = (req, res) => {
-  const { id, amount } = req.body;
-
   try {
+    const { id, amount } = req.body;
+
     const payment = db.prepare(
       "SELECT * FROM payments WHERE id = ?"
     ).get(id);
@@ -64,7 +87,6 @@ exports.addPartialPayment = (req, res) => {
     const newPaid = currentPaid + Number(amount);
 
     let status = "pending";
-
     if (newPaid >= total) {
       status = "completed";
     }
