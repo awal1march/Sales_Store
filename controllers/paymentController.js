@@ -45,7 +45,7 @@ exports.getPayments = (req, res) => {
 };
 
 // ======================
-// DELETE PAYMENT (HARD DELETE - OPTIONAL)
+// DELETE PAYMENT
 // ======================
 exports.deletePayment = (req, res) => {
   const { id } = req.params;
@@ -68,7 +68,7 @@ exports.deletePayment = (req, res) => {
 };
 
 // ======================
-// ADD PARTIAL PAYMENT (INSTALLMENT FIXED)
+// ADD PARTIAL PAYMENT (INSTALLMENT)
 // ======================
 exports.addPartialPayment = (req, res) => {
   try {
@@ -88,9 +88,8 @@ exports.addPartialPayment = (req, res) => {
 
     const currentPaid = Number(payment.paid_amount) || 0;
     const total = Number(payment.total_amount) || 0;
-    const addAmount = Number(amount);
 
-    const newPaid = currentPaid + addAmount;
+    const newPaid = currentPaid + Number(amount);
 
     let status = "pending";
 
